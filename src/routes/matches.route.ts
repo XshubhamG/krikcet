@@ -12,6 +12,7 @@ import { desc } from "drizzle-orm";
 
 const router: Router = Router();
 const MAX_LIMIT = 100;
+
 router.get("/", async (req: Request, res: Response) => {
   const parsed = listMatchesQuerySchema.safeParse(req.query);
   if (!parsed.success) {
@@ -34,6 +35,7 @@ router.get("/", async (req: Request, res: Response) => {
     });
   }
 });
+
 router.post("/", async (req: Request, res: Response) => {
   const parsed = createMatchSchema.safeParse(req.body);
 
@@ -55,6 +57,10 @@ router.post("/", async (req: Request, res: Response) => {
         status: getMatchStatus(startTime, endTime) ?? MATCH_STATUS.SCHEDULED,
       })
       .returning();
+
+    if (res.app.locals.broadcastMatchCreated) {
+      res.app.locals.broadcastMatchCreated(match);
+    }
 
     res.status(201).json({ message: "Match created successfully", match });
   } catch (error) {
