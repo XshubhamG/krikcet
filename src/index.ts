@@ -31,6 +31,7 @@ app.get("/health", (req: Request, res: Response) => {
 // Graceful shutdown
 process.on("SIGINT", async () => {
   console.log("\nShutting down gracefully...");
+  server.close();
   await pool.end();
   process.exit(0);
 });

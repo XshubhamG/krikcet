@@ -64,7 +64,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     res.status(201).json({ message: "Match created successfully", match });
   } catch (error) {
-    console.error("Error fetching matches:", error);
+    console.error("Error fetching match:", error);
     return res.status(500).json({
       message: "Internal server error",
     });
