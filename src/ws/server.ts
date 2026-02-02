@@ -42,10 +42,10 @@ export function attachWebSocketServer(server: Server) {
 
   const interval = setInterval(() => {
     wss.clients.forEach((client) => {
-      if ((client as ExtendedWebSocket).isAlive === false)
-        return client.terminate();
-      (client as ExtendedWebSocket).isAlive = false;
-      (client as ExtendedWebSocket).ping();
+      const extClient = client as ExtendedWebSocket;
+      if (extClient.isAlive === false) return client.terminate();
+      extClient.isAlive = false;
+      extClient.ping();
     });
   }, 30000);
   wss.on("close", () => {
