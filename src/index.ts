@@ -1,12 +1,23 @@
 import "dotenv/config";
 import express, { Request, Response } from "express";
 import { pool } from "./db/db.js";
+import matchesRouter from "./routes/matches.route.js";
+import { createServer } from "http";
+import { attachWebSocketServer } from "./ws/server.js";
+
+const PORT = parseInt(process.env.PORT || "3000");
+const HOST = process.env.HOST || "0.0.0.0";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const server = createServer(app);
 
 // Middleware
 app.use(express.json());
+
+app.use("/matches", matchesRouter);
+
+const { broadcastMatchCreated } = attachWebSocketServer(server);
+app.locals.broadcastMatchCreated = broadcastMatchCreated;
 
 // Routes
 app.get("/", (req: Request, res: Response) => {
@@ -25,6 +36,11 @@ process.on("SIGINT", async () => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+  const baseUrl =
+    HOST === "0.0.0.0" ? `http://localhost:${PORT}` : `http://${HOST}:${PORT}`;
+  console.log(`Server is running on ${baseUrl}`);
+  console.log(
+    `WebSocket server is running on ${baseUrl.replace("http", "ws")}/ws`
+  );
 });
