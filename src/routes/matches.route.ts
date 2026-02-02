@@ -3,11 +3,11 @@ import { Request, Response } from "express";
 import {
   createMatchSchema,
   listMatchesQuerySchema,
+  MATCH_STATUS,
 } from "../validation/matches";
 import { db } from "../db/db";
 import { matches as matchesTable } from "../db/schema";
 import { getMatchStatus } from "../utils/match-status";
-import { MatchStatus } from "../types";
 import { desc } from "drizzle-orm";
 
 const router: Router = Router();
@@ -28,9 +28,9 @@ router.get("/", async (req: Request, res: Response) => {
       .limit(limit);
     res.status(200).json({ matches });
   } catch (error) {
+    console.error("Error fetching matches:", error);
     return res.status(500).json({
       message: "Internal server error",
-      details: JSON.stringify(error),
     });
   }
 });
@@ -52,15 +52,15 @@ router.post("/", async (req: Request, res: Response) => {
         endTime: new Date(endTime),
         homeScore: homeScore ?? 0,
         awayScore: awayScore ?? 0,
-        status: getMatchStatus(startTime, endTime) as MatchStatus,
+        status: getMatchStatus(startTime, endTime) ?? MATCH_STATUS.SCHEDULED,
       })
       .returning();
 
     res.status(201).json({ message: "Match created successfully", match });
   } catch (error) {
+    console.error("Error fetching matches:", error);
     return res.status(500).json({
       message: "Internal server error",
-      details: JSON.stringify(error),
     });
   }
 });
