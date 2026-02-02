@@ -28,6 +28,9 @@ Thumbs.db
 # TypeScript cache
 *.tsbuildinfo
 
+# Drizzle migrations (optional - you may want to commit these)
+# drizzle/
+
 # Test coverage
 coverage/
 

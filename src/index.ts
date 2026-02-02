@@ -1,4 +1,6 @@
+import "dotenv/config";
 import express, { Request, Response } from "express";
+import { pool } from "./db/db.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,6 +15,13 @@ app.get("/", (req: Request, res: Response) => {
 
 app.get("/health", (req: Request, res: Response) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// Graceful shutdown
+process.on("SIGINT", async () => {
+  console.log("\nShutting down gracefully...");
+  await pool.end();
+  process.exit(0);
 });
 
 // Start server
